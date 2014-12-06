@@ -13,6 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -130,7 +131,7 @@ public class MainPage extends JFrame {
 		        DefaultListModel listModel = new DefaultListModel();
 		        
 		        if(returnVal == JFileChooser.APPROVE_OPTION) {
-		               //System.out.println("You chose to open this file: " + chooser.getSelectedFile().getAbsolutePath());
+		               System.out.println("You chose to open this file: " + chooser.getSelectedFile().getAbsolutePath());
 		               textField.setText(chooser.getSelectedFile().getAbsolutePath());
 		               File dir = new File(chooser.getSelectedFile().getAbsolutePath());  
 		               
@@ -141,7 +142,7 @@ public class MainPage extends JFrame {
 		               });  
 		                  
 		               for (File subDir : subDirs) {  
-		                   //System.out.println(subDir.getName()); 
+		                   System.out.println(subDir.getName()); 
 		                   
 		                   nvp.put(subDir.getName(),subDir.getAbsolutePath().toString());
 		                   list_1.add(processMovieName(subDir.getName()));
@@ -161,33 +162,36 @@ public class MainPage extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					 Iterator it=nvp.entrySet().iterator();
-					 dlg  = new JDialog(MainPage.this, "Downloading Movie Info", true);
-					dpb = new JProgressBar(0, 500);
-					    dlg.add(BorderLayout.CENTER, dpb);
-					    jl=new JLabel("Downloading...");
-				    dlg.add(BorderLayout.NORTH, jl);
-					    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-					    dlg.setSize(300, 75);
-					    dlg.setLocationRelativeTo(MainPage.this);
-					    //dlg.setVisible(true);
-					    dlg.setVisible(true);
+//					 dlg  = new JDialog(MainPage.this, "Downloading Movie Info", true);
+//					dpb = new JProgressBar(0, 500);
+//					    dlg.add(BorderLayout.CENTER, dpb);
+//					    jl=new JLabel("Downloading...");
+//				    dlg.add(BorderLayout.NORTH, jl);
+//					    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+//					    dlg.setSize(300, 75);
+//					    dlg.setLocationRelativeTo(MainPage.this);
+//					    //dlg.setVisible(true);
+//					    dlg.setVisible(true);
 					while(it.hasNext())
 					{
 						Map.Entry pairs = (Map.Entry)it.next();
 						String name=(String) pairs.getKey();
-						//System.out.println(name);
-						//System.out.println(pairs.getValue().toString());
+						System.out.println(name);
+						System.out.println(pairs.getValue().toString());
 						String moviename=processMovieName(name);
 						//jl.setText("Processing:"+moviename);
 					   //dpb.setValue(processed);
-						jl.setText("Procesing "+moviename);
-						dpb.setValue(dpb.getValue()+10);
+						//jl.setText("Procesing "+moviename);
+						//dpb.setValue(dpb.getValue()+10);
+						MainPage.this.setTitle("Processing : "+moviename);
 						String url = "http://www.omdbapi.com/?t="+URLEncoder.encode(moviename);
 						jsonParse(sendGet(url,pairs.getValue().toString()),pairs.getValue().toString(),pairs.getKey().toString());
 						System.out.println("Current item "+processed+" "+moviename);
 						
 					}
+					MainPage.this.setTitle("Completed.");
 					System.out.println("Finished");
+					JOptionPane.showMessageDialog(MainPage.this, "Completed");
 					dlg.dispose();
 					
 				} catch (Exception e1) {
@@ -216,8 +220,8 @@ public class MainPage extends JFrame {
 		//con.setRequestProperty("User-Agent", USER_AGENT);
  
 		int responseCode = con.getResponseCode();
-		//System.out.println("\nSending 'GET' request to URL : " + url);
-		//System.out.println("Response Code : " + responseCode);
+		System.out.println("\nSending 'GET' request to URL : " + url);
+		System.out.println("Response Code : " + responseCode);
  
 		BufferedReader in = new BufferedReader(
 		        new InputStreamReader(con.getInputStream()));
@@ -231,14 +235,14 @@ public class MainPage extends JFrame {
 		
  
 		//print result
-		//System.out.println(response.toString());
+		System.out.println(response.toString());
 		return response.toString();
  
 	}
 	
 	private void jsonParse(String string,String path, String moviename) throws ParseException {
 		JSONParser jp=new JSONParser();
-		//System.out.println("Movie name @@@@@@@@"+string);
+		System.out.println("Movie name @@@@@@@@"+string);
 		try {
 
 			JSONObject prime=(JSONObject) jp.parse(string);
@@ -268,26 +272,26 @@ public class MainPage extends JFrame {
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			////System.out.println("Cannot parse "+string);
+			//System.out.println("Cannot parse "+string);
 			//e.printStackTrace();
 			JSONObject prime=(JSONObject) jp.parse(string);
 			String Error=(String) prime.get("Error");
 			try{
 			if(Error.contains("Movie not found!"))
 			{
-				//System.out.println("Movie not found trying Google Image search....");
+				System.out.println("Movie not found trying Google Image search....");
 				try {
 					saveImage("nil", path+"\\folder.jpg", moviename, "", "",path);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-					//System.out.println("Njan tholvi sammathichirikkunnu!!!");
+					System.out.println("Njan tholvi sammathichirikkunnu!!!");
 				}
 			}
 			}
 			catch(NullPointerException nullpException)
 			{
-				//System.out.println("^^^^^^^^^^^^^^^^^^^"+string);
+				System.out.println("^^^^^^^^^^^^^^^^^^^"+string);
 			}
 			//e.printStackTrace();
 		}
@@ -305,11 +309,11 @@ public class MainPage extends JFrame {
 		{
 			String googleSearchURL="https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q="+URLEncoder.encode(imdbid+" "+title+" "+year+" poster");
 			try {
-				//System.out.println("###############"+googleSearchURL);
+				System.out.println("###############"+googleSearchURL);
 				String response = sendGet(googleSearchURL, destinationFile);
-				//System.out.println("###############"+googleSearchURL);
+				System.out.println("###############"+googleSearchURL);
 				imageUrl=googleImageParser(response);
-				//System.out.println(imageUrl);
+				System.out.println(imageUrl);
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -317,7 +321,7 @@ public class MainPage extends JFrame {
 			}
 			
 		}
-		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"+imageUrl);
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"+imageUrl);
 		URL url = new URL(imageUrl);
 		try{
 		InputStream is = url.openStream();
@@ -342,7 +346,7 @@ public class MainPage extends JFrame {
 			}
 			catch(EmptyStackException emptyStackException)
 			{
-				//System.out.println("Nothing to pop");
+				System.out.println("Nothing to pop");
 			}
 		}
 		try{
@@ -374,12 +378,12 @@ public class MainPage extends JFrame {
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			//System.out.println("Ennekkond ith parse cheyyan vayya @@@@@@@@@@@\n"+response);
+			System.out.println("Ennekkond ith parse cheyyan vayya @@@@@@@@@@@\n"+response);
 			return urlStack.pop();
 		}
 		catch (NullPointerException e) {
 			// TODO: handle exception
-			//System.out.println("Chilappo reqeust exceed aayikkanum,kuzhappam illa");
+			System.out.println("Chilappo reqeust exceed aayikkanum,kuzhappam illa");
 			return urlStack.pop();
 		}
 		
@@ -412,11 +416,11 @@ public class MainPage extends JFrame {
 	String year=m.group(0);
 	if(copyOfName.substring(0,3).equals(year))
 		return year;
-	//System.out.println("Year :"+year);
+	System.out.println("Year :"+year);
 	
 	}catch(Exception e)
 	{
-		//System.out.println("No year found");
+		System.out.println("No year found");
 	}
 	return name;
 	}
